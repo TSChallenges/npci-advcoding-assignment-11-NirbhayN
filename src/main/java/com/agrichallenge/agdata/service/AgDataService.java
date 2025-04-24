@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,22 +31,27 @@ public class AgDataService {
         return objectMapper.readValue(inputStream, new TypeReference<List<AgData>>() {});
     }
 
+    List<AgData> listData=loadAgData();
+
     public Long getCropCount(String cropName) {
         // TODO: Implement this method to Count how many times a specific crop appears in the dataset
+        return listData.stream().filter(p->p.getCrop().equalsIgnoreCase(cropName)).count();
 
-        return 0L;
     }
 
     public double getAverageYield(String cropName) {
         // TODO: Implement this method to Calculate the average yield for a specific crop if it exists, else return 0.0
-
-        return 0.0;
+            if(getCropCount(cropName)>0){
+                DoubleSummaryStatistics doubleSummaryStatistics=  listData.stream().filter(p->p.getCrop().equalsIgnoreCase(cropName)).collect(Collectors.summarizingDouble(p->p.getYield()));
+                return doubleSummaryStatistics.getAverage();
+            }
+            return 0.0;
     }
 
     public List<AgData> getRecordsByRegion(String region) {
         // TODO: Implement this method to Get all records from a specific region
+        return listData.stream().filter(p->p.getRegion().equalsIgnoreCase(region)).toList();
 
-        return null;
     }
 
 }
